@@ -4,20 +4,16 @@
 
 uniform vec3 worldCameraPosition;
 uniform vec3 worldLightPosition;
-uniform vec3 m_diffuse;
 
-uniform vec3 m_ambient;
-uniform vec3 m_specular;
+uniform vec3 diffuseColor, ambientColor, specularColor;
+
 uniform float shininess;
+
+uniform vec3 light_A, light_S, light_D;
 
 uniform sampler2D diffuseTexture;
 uniform bool wireframeEnabled;
 uniform vec4 wireframeLineColor;
-
-uniform float smoothValue;
-uniform vec3 light_d;
-uniform vec3 light_a;
-uniform vec3 light_s;
 
 in fragmentData
 {
@@ -31,10 +27,11 @@ out vec4 fragColor;
 
 void main()
 {
-	vec3 lightVector = fragment.position-worldLightPosition;
-	vec3 viewerVector = fragment.position-worldCameraPosition;
-	vec3 reflectedVector = 2*dot(lightVector,fragment.normal)*fragment.normal-lightVector;
-	vec4 result = vec4(m_ambient*light_a + m_diffuse*dot(lightVector,fragment.normal)*light_d + m_specular*pow(dot(reflectedVector,viewerVector),shininess)*light_s,1.0)*smoothValue;
+	vec3 viewer =  normalize(worldCameraPosition - fragment.position);
+	vec3 light =  normalize(worldLightPosition - fragment.position);
+	vec3 reflected = normalize(2*dot(light,fragment.normal)*fragment.normal-light);
+	vec3 total = ambientColor*light_A + diffuseColor*dot(light, normalize(fragment.normal))*light_D + specularColor*(pow(dot(reflected,viewer), shininess))*light_S;
+	vec4 result = vec4(total,1.0);
 
 	if (wireframeEnabled)
 	{
