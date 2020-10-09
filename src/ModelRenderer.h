@@ -46,6 +46,12 @@ namespace minity
 		glm::vec3 m_specular = glm::vec3(0.0f, 0.0f, 0.0f);
 
 		bool reset_prop = true;
+
+		bool ambTxt = false, difTxt = false, spcTxt = false;
+
+		bool objSpace = false, tangSpace = false, bumpMapping = false;
+
+		float amp = 1, freq = 1;
 	};
 
 }

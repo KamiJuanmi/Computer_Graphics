@@ -47,6 +47,9 @@ namespace minity
 		std::shared_ptr<globjects::Texture> specularTexture;
 		std::shared_ptr<globjects::Texture> shininessTexture;
 		std::shared_ptr<globjects::Texture> bumpTexture;
+
+		std::shared_ptr<globjects::Texture> objectSpaceNormalTexture;
+		std::shared_ptr<globjects::Texture> tangentSpaceNormalTexture;
 	};
 
 	class Model

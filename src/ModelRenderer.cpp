@@ -136,11 +136,51 @@ void ModelRenderer::display()
 				material.diffuseTexture->bindActive(0);
 			}
 
+			if (material.ambientTexture)
+			{
+				shaderProgramModelBase->setUniform("ambientTexture", 1);
+				material.ambientTexture->bindActive(1);
+			}
+
+			if (material.specularTexture)
+			{
+				shaderProgramModelBase->setUniform("specularTexture", 2);
+				material.specularTexture->bindActive(2);
+			}
+
+			if (material.objectSpaceNormalTexture)
+			{
+				shaderProgramModelBase->setUniform("objectSpaceNormals", 3);
+				material.objectSpaceNormalTexture->bindActive(3);
+			}
+
+			if (material.tangentSpaceNormalTexture)
+			{
+				shaderProgramModelBase->setUniform("tangentSpaceNormals", 4);
+				material.tangentSpaceNormalTexture->bindActive(4);
+			}
+
 			viewer()->scene()->model()->vertexArray().drawElements(GL_TRIANGLES, groups.at(i).count(), GL_UNSIGNED_INT, (void*)(sizeof(GLuint)*groups.at(i).startIndex));
 
 			if (material.diffuseTexture)
 			{
 				material.diffuseTexture->unbind();
+			}
+			if (material.ambientTexture)
+			{
+				material.ambientTexture->unbind();
+			}
+			if (material.specularTexture)
+			{
+				material.specularTexture->unbind();
+			}
+			if (material.objectSpaceNormalTexture)
+			{
+				material.objectSpaceNormalTexture->unbind();
+			}
+			if (material.tangentSpaceNormalTexture)
+			{
+				material.tangentSpaceNormalTexture->unbind();
 			}
 		}
 	}
@@ -172,6 +212,67 @@ void ModelRenderer::display()
 	shaderProgramModelBase->setUniform("diffuseColor", m_diffuse);
 	shaderProgramModelBase->setUniform("specularColor", m_specular);
 	shaderProgramModelBase->setUniform("ambientColor", m_ambient);
+
+	if (ImGui::BeginMenu("Assignment2")) {
+
+		ImGui::Checkbox("Ambient  Textures", &ambTxt);
+		ImGui::Checkbox("Diffuse  Textures", &difTxt);
+		ImGui::Checkbox("Specular Textures", &spcTxt);
+
+
+		const char* items[] = { "None", "Object Space", "Tangent Space" };
+		static const char* current_item = "None";
+		if (ImGui::BeginCombo("Space Textures", current_item)) 
+		{
+			for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+			{
+				bool is_selected = (current_item == items[n]); 
+				if (ImGui::Selectable(items[n], is_selected))
+					current_item = items[n];
+				if (is_selected)
+					ImGui::SetItemDefaultFocus();  
+			}
+			switch (current_item[0])
+			{
+			case 'N':	
+				if(objSpace == true || tangSpace == true)
+					objSpace = tangSpace = false;
+				break;
+			case 'O':	
+				if (tangSpace == true)
+					tangSpace = false;
+				if (objSpace !=true)
+					objSpace = true;
+				break;
+			case 'T':	
+				if (objSpace == true)
+					objSpace = false;
+				if (tangSpace != true)
+					tangSpace = true;
+				break;
+			}
+			ImGui::EndCombo();
+		}
+		if (tangSpace) {
+			if (ImGui::CollapsingHeader("Bump Mapping"))
+			{
+				ImGui::SliderFloat("Amplitude", &amp, 1.0f, 300.0f);
+				ImGui::SliderFloat("Frequency", &freq, 1.0f, 300.0f);
+				ImGui::Checkbox("Enabel Bump Mapping", &bumpMapping);
+			}
+		}		
+
+		ImGui::EndMenu();
+	}
+
+	shaderProgramModelBase->setUniform("diff_txt", difTxt);
+	shaderProgramModelBase->setUniform("ambn_txt", ambTxt);
+	shaderProgramModelBase->setUniform("spec_txt", spcTxt);
+	shaderProgramModelBase->setUniform("objSpace", objSpace);
+	shaderProgramModelBase->setUniform("tangSpace", tangSpace);
+	shaderProgramModelBase->setUniform("bumpMapping", bumpMapping);
+	shaderProgramModelBase->setUniform("amp", amp);
+	shaderProgramModelBase->setUniform("freq", freq);
 
 	shaderProgramModelBase->release();
 
