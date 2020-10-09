@@ -104,7 +104,6 @@ void ModelRenderer::display()
 		ImGui::EndMenu();
 	}
 
-
 	vec4 worldCameraPosition = inverseModelViewMatrix * vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	vec4 worldLightPosition = inverseModelLightMatrix * vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -114,9 +113,7 @@ void ModelRenderer::display()
 	shaderProgramModelBase->setUniform("worldLightPosition", vec3(worldLightPosition));
 	shaderProgramModelBase->setUniform("wireframeEnabled", wireframeEnabled);
 	shaderProgramModelBase->setUniform("wireframeLineColor", wireframeLineColor);
-	shaderProgramModelBase->setUniform("smoothValue", m_smooth);
-	
-	
+
 	shaderProgramModelBase->use();
 
 	for (uint i = 0; i < groups.size(); i++)
@@ -125,17 +122,12 @@ void ModelRenderer::display()
 		{
 			const Material & material = materials.at(groups.at(i).materialIndex);
 
-
-			shaderProgramModelBase->setUniform("m_ambient", material.ambient);
-			shaderProgramModelBase->setUniform("m_diffuse", material.diffuse);
-			shaderProgramModelBase->setUniform("m_specular", material.specular);
-			shaderProgramModelBase->setUniform("shininess", material.shininess);
-			if (ImGui::Begin("Assignment1 Parameters")) {
-				ImGui::SliderFloat("Smooth", &m_smooth, 0.0f, 1.0f);
-				ImGui::ColorEdit3("la", (float*)(&light_a));
-				ImGui::ColorEdit3("ld", (float*)(&light_d));
-				ImGui::ColorEdit3("ls", (float*)(&light_s));
-				ImGui::End();
+			if (reset_prop) {
+				m_diffuse = material.diffuse;
+				m_specular = material.specular;
+				m_ambient = material.ambient;
+				m_shininess = material.shininess;
+				reset_prop = false;
 			}
 
 			if (material.diffuseTexture)
@@ -153,13 +145,35 @@ void ModelRenderer::display()
 		}
 	}
 
-	shaderProgramModelBase->setUniform("light_a", light_a);
-	shaderProgramModelBase->setUniform("light_d", light_d);
-	shaderProgramModelBase->setUniform("light_s", light_s);
+	if (ImGui::BeginMenu("Assignment1")) {
+		if (ImGui::CollapsingHeader("Light Control"))
+		{
+			ImGui::ColorEdit3("Ambient Light", (float*)(&light_a));
+			ImGui::ColorEdit3("Diffuse Light", (float*)(&light_d));
+			ImGui::ColorEdit3("Specular Light", (float*)(&light_s));
+		}
+		if (ImGui::CollapsingHeader("Properties Control"))
+		{
+			ImGui::ColorEdit3("Ka", (float*)(&m_ambient));
+			ImGui::ColorEdit3("Kd", (float*)(&m_diffuse));
+			ImGui::ColorEdit3("Ks", (float*)(&m_specular));
+			ImGui::SliderFloat("shininess", &m_shininess, 0.0f, 300.0f);
+			ImGui::Checkbox("Reset Properties", &reset_prop);
+		}
+
+		ImGui::EndMenu();
+	}
+
+	shaderProgramModelBase->setUniform("light_A", light_a);
+	shaderProgramModelBase->setUniform("light_S", light_s);
+	shaderProgramModelBase->setUniform("light_D", light_d);
+
+	shaderProgramModelBase->setUniform("shininess", m_shininess);
+	shaderProgramModelBase->setUniform("diffuseColor", m_diffuse);
+	shaderProgramModelBase->setUniform("specularColor", m_specular);
+	shaderProgramModelBase->setUniform("ambientColor", m_ambient);
 
 	shaderProgramModelBase->release();
-
-	
 
 	viewer()->scene()->model()->vertexArray().unbind();
 

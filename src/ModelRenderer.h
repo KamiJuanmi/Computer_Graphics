@@ -35,12 +35,17 @@ namespace minity
 		std::unique_ptr<globjects::VertexArray> m_lightArray = std::make_unique<globjects::VertexArray>();
 		std::unique_ptr<globjects::Buffer> m_lightVertices = std::make_unique<globjects::Buffer>();
 
-		float m_smooth = 0.5f;
-
-		glm::vec3 light_a = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 light_a = glm::vec3(1.0f, 1.0f, 1.0f);
 		glm::vec3 light_d = glm::vec3(1.0f, 1.0f, 1.0f);
 		glm::vec3 light_s = glm::vec3(0.0f, 0.0f, 0.0f);
-		float m_shininess = 0.0;
+
+		float m_shininess = 0.0f;
+
+		glm::vec3 m_ambient = glm::vec3(1.0f, 1.0f, 1.0f);
+		glm::vec3 m_diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+		glm::vec3 m_specular = glm::vec3(0.0f, 0.0f, 0.0f);
+
+		bool reset_prop = true;
 	};
 
 }
