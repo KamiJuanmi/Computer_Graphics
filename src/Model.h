@@ -26,6 +26,10 @@ namespace minity
 		glm::uint materialIndex = 0;
 		glm::uint startIndex = 0;
 		glm::uint endIndex = 0;
+
+		glm::vec3 centre_group = glm::vec3(0.0f);
+		glm::vec3 offsetVector = glm::vec3(0.0f);
+
 		
 		glm::uint count() const
 		{
@@ -83,6 +87,7 @@ namespace minity
 
 		glm::vec3 m_minimumBounds = glm::vec3(0.0);
 		glm::vec3 m_maximumBounds = glm::vec3(0.0);
+		glm::vec3 m_centre = glm::vec3(0.0);
 
 		std::unique_ptr<globjects::VertexArray> m_vertexArray = std::make_unique<globjects::VertexArray>();
 		std::unique_ptr<globjects::Buffer> m_vertexBuffer = std::make_unique<globjects::Buffer>();

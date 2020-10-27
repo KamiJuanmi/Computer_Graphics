@@ -451,4 +451,65 @@ void Viewer::mainMenu()
 
 		ImGui::EndMenu();
 	}
+
+}
+
+float & Viewer::explosion() 
+{
+	return expl_degree;
+}
+
+float Viewer::explosion() const
+{
+	return expl_degree;
+}
+
+Animation & Viewer::animation()
+{
+	return anim;
+}
+
+Animation Viewer::animation() const
+{
+	return anim;
+}
+
+bool& Viewer::addFrame() 
+{
+	return add_frame;
+}
+
+bool Viewer::addFrame() const
+{
+	return add_frame;
+}
+
+bool& Viewer::remFrame() 
+{
+	return rem_frame;
+}
+
+bool Viewer::remFrame() const
+{
+	return rem_frame;
+}
+
+bool& Viewer::is_played()
+{
+	return m_play;
+}
+
+bool Viewer::is_played() const
+{
+	return m_play;
+}
+
+bool& Viewer::clearFrames()
+{
+	return clear_frames;
+}
+
+bool Viewer::clearFrames() const
+{
+	return clear_frames;
 }

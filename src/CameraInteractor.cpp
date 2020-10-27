@@ -12,6 +12,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include <glbinding/gl/gl.h>
 #include <glbinding/gl/enum.h>
@@ -25,6 +26,7 @@
 using namespace minity;
 using namespace glm;
 using namespace gl;
+
 
 CameraInteractor::CameraInteractor(Viewer * viewer) : Interactor(viewer)
 {
@@ -119,6 +121,22 @@ void CameraInteractor::keyEvent(int key, int scancode, int action, int mods)
 	else if (key == GLFW_KEY_H && action == GLFW_RELEASE)
 	{
 		m_headlight = !m_headlight;
+	}
+	else if (key == GLFW_KEY_A && action == GLFW_RELEASE) 
+	{
+		viewer()->addFrame() = true;
+	}
+	else if (key == GLFW_KEY_R && action == GLFW_RELEASE)
+	{
+		viewer()->remFrame() = true;
+	}
+	else if (key == GLFW_KEY_P && action == GLFW_RELEASE)
+	{
+		viewer()->is_played() = true;
+	}
+	else if (key == GLFW_KEY_C && action == GLFW_RELEASE)
+	{
+		viewer()->clearFrames() = true;
 	}
 }
 
@@ -262,7 +280,6 @@ void CameraInteractor::display()
 		mat4 newViewTransform = rotate(viewTransform, pi<float>() / 180.0f, vec3(transformedAxis));
 		viewer()->setViewTransform(newViewTransform);
 
-
 		if (m_frameCount >= 360)
 		{
 			double currentTime = glfwGetTime();
@@ -274,7 +291,86 @@ void CameraInteractor::display()
 			m_benchmark = false;
 		}
 
+	}
 
+	if (viewer()->addFrame())
+	{
+		Frame newFrame;
+		newFrame.backgroundColor = viewer()->backgroundColor();
+		newFrame.explosionOffset = viewer()->explosion();
+		newFrame.lightTransform = viewer()->lightTransform();
+		newFrame.viewTransform = viewer()->viewTransform();
+		viewer()->animation().storeFrame(newFrame);
+
+		std::cout << "Adding a new frame, we have: " << viewer()->animation().num_frames() << " frames." << std::endl;
+
+		viewer()->addFrame() = false;
+	}
+
+	if(viewer()->remFrame())
+	{
+		int num_frames = viewer()->animation().num_frames();
+		if (num_frames == 0)
+		{
+			std::cout << "0 minus 1?? Where are you going?" << std::endl;
+		}
+		else
+		{
+			viewer()->animation().removeFrame();
+			num_frames--;
+			std::cout << "Removed another frame, we have " << num_frames << " frames." << std::endl;
+		}
+		viewer()->remFrame() = false;
+	}
+
+	if (viewer()->clearFrames())
+	{
+		int num_frames = viewer()->animation().num_frames();
+		if (num_frames == 0)
+		{
+			std::cout << "You can't destroy something that doesn't exist." << std::endl;
+		}
+		else
+		{
+			std::cout << "Deleting all the frames." << std::endl;
+			viewer()->animation().resetFrames();
+		}
+		viewer()->clearFrames() = false;
+	}
+
+	if (viewer()->is_played() && !playing)
+	{
+		int num_frames = viewer()->animation().num_frames();
+		if (num_frames == 0)
+		{
+			std::cout << "Here is the animation of a 0: 0." << std::endl;
+			viewer()->is_played() = false;
+		}
+		else
+		{
+			std::cout << "Starting the animation." << std::endl;
+			anim_startTime = glfwGetTime();
+			playing = true;
+		}
+	}
+
+	if (playing)
+	{
+		Frame newFrame;
+		double deltaTime = (glfwGetTime() - anim_startTime)/7;
+
+		newFrame = viewer()->animation().play(deltaTime);
+
+		viewer()->setBackgroundColor(newFrame.backgroundColor);
+		viewer()->setViewTransform(newFrame.viewTransform);
+		viewer()->setLightTransform(newFrame.lightTransform);
+		viewer()->explosion() = newFrame.explosionOffset;
+
+		if (deltaTime >= 1)
+		{
+			viewer()->is_played() = false;
+			playing = false;
+		}
 	}
 
 	if (ImGui::BeginMenu("Camera"))
@@ -292,6 +388,48 @@ void CameraInteractor::display()
 		ImGui::Checkbox("Headlight", &m_headlight);
 		ImGui::EndMenu();
 	}
+
+	/*DEBUG decompose
+	static int num = 0;
+	if (num == 0)
+	{
+		mat4 test = viewer()->modelLightTransform();
+
+		std::cout << "Before Decompose" << std::endl;
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				std::cout << test[i][j] << "\t";
+			}
+
+			std::cout << std::endl;
+		}
+
+		vec3 aux, aux1;
+		quat aux2;
+
+		decompose(test, aux, aux2, aux1);
+
+		std::cout << " After Decompose and Compose" << std::endl;
+
+		test = compose(aux, aux2, aux1);
+
+
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				std::cout << test[i][j] << "\t";
+			}
+
+			std::cout << std::endl;
+		}
+		num++;
+	}
+	*/
+
+
 }
 
 void CameraInteractor::resetProjectionTransform()

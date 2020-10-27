@@ -40,6 +40,9 @@ namespace minity
 		glm::uint m_frameCount = 0;
 		double m_xPrevious = 0.0, m_yPrevious = 0.0;
 		double m_xCurrent = 0.0, m_yCurrent = 0.0;
+
+		bool playing = false;
+		double anim_startTime = 0.0;
 	};
 
 }

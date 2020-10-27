@@ -73,7 +73,7 @@ void ModelRenderer::display()
 	const std::vector<Material> & materials = viewer()->scene()->model()->materials();
 
 	static std::vector<bool> groupEnabled(groups.size(), true);
-	static bool wireframeEnabled = true;
+	static bool wireframeEnabled = false;
 	static bool lightSourceEnabled = true;
 	static vec4 wireframeLineColor = vec4(1.0f);
 
@@ -122,6 +122,8 @@ void ModelRenderer::display()
 		{
 			const Material & material = materials.at(groups.at(i).materialIndex);
 
+			shaderProgramModelBase->setUniform("explosionVector", groups.at(i).offsetVector * viewer()->explosion());
+
 			if (reset_prop) {
 				m_diffuse = material.diffuse;
 				m_specular = material.specular;
@@ -162,26 +164,26 @@ void ModelRenderer::display()
 
 			viewer()->scene()->model()->vertexArray().drawElements(GL_TRIANGLES, groups.at(i).count(), GL_UNSIGNED_INT, (void*)(sizeof(GLuint)*groups.at(i).startIndex));
 
-			if (material.diffuseTexture)
+			if (material.tangentSpaceNormalTexture)
 			{
-				material.diffuseTexture->unbind();
-			}
-			if (material.ambientTexture)
-			{
-				material.ambientTexture->unbind();
-			}
-			if (material.specularTexture)
-			{
-				material.specularTexture->unbind();
+				material.tangentSpaceNormalTexture->unbind();
 			}
 			if (material.objectSpaceNormalTexture)
 			{
 				material.objectSpaceNormalTexture->unbind();
 			}
-			if (material.tangentSpaceNormalTexture)
+			if (material.specularTexture)
 			{
-				material.tangentSpaceNormalTexture->unbind();
+				material.specularTexture->unbind();
 			}
+			if (material.ambientTexture)
+			{
+				material.ambientTexture->unbind();
+			}
+			if (material.diffuseTexture)
+			{
+				material.diffuseTexture->unbind();
+			}			
 		}
 	}
 
@@ -273,6 +275,16 @@ void ModelRenderer::display()
 	shaderProgramModelBase->setUniform("bumpMapping", bumpMapping);
 	shaderProgramModelBase->setUniform("amp", amp);
 	shaderProgramModelBase->setUniform("freq", freq);
+
+	if (ImGui::BeginMenu("Assignment3")) {
+		ImGui::SliderFloat("Explosion Degree", &viewer()->explosion(), 0.0f, 10.0f);
+		ImGui::Checkbox("Add a new Frame", &viewer()->addFrame());
+		ImGui::Checkbox("Remove a Frame", &viewer()->remFrame());
+		ImGui::Checkbox("Play the animation", &viewer()->is_played());
+		ImGui::Text("Number of Frames -> %d",viewer()->animation().num_frames());
+		ImGui::Checkbox("Delete all the frames", &viewer()->clearFrames());
+		ImGui::EndMenu();
+	}
 
 	shaderProgramModelBase->release();
 

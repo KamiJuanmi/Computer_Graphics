@@ -31,7 +31,6 @@ using namespace gl;
 using namespace glm;
 using namespace globjects;
 using namespace minity;
-using namespace std;
 
 void error_callback(int errnum, const char * errmsg)
 {

@@ -29,14 +29,13 @@ in fragmentData
 	vec3 normal;
 	vec2 texCoord;
 	noperspective vec3 edgeDistance;
-	vec3 tangent, bitangent;
 	mat3 TBN;
 } fragment;
 
 float bump_func(vec2 txCoord)
 {
-	//return amp*pow(sin(freq*txCoord.x),2)*pow(sin(freq*txCoord.y),2);
-	return amp*exp(pow(sin(freq*txCoord.x),2)*pow(cos(freq*txCoord.x),2))*(pow(sin(freq*txCoord.y),2)*pow(cos(freq*txCoord.y),2));
+	return amp*pow(sin(freq*txCoord.x),2)*pow(sin(freq*txCoord.y),2);
+	//return amp*exp(pow(sin(freq*txCoord.x),2)*pow(cos(freq*txCoord.x),2))*(pow(sin(freq*txCoord.y),2)*pow(cos(freq*txCoord.y),2));
 }
 
 out vec4 fragColor;
@@ -58,7 +57,7 @@ void main()
 		{
 			//Pu = tangent; Pv=bitangent
 			//N' = N + dy(Pu x n) + dx(n x Pv)
-			normal = normal + dFdy(bump_func(fragment.texCoord))*(cross(fragment.tangent,normalize(normal))) + dFdx(bump_func(fragment.texCoord))*(cross(normalize(normal),fragment.bitangent));
+			normal = normal + dFdy(bump_func(fragment.texCoord))*(cross(fragment.TBN[0],normalize(normal))) + dFdx(bump_func(fragment.texCoord))*(cross(normalize(normal),fragment.TBN[1]));
 		}
 		
 		normal = normalize(fragment.TBN * normal);

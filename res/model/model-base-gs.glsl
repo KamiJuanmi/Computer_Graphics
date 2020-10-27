@@ -20,7 +20,6 @@ out fragmentData
 	vec3 normal;
 	vec2 texCoord;
 	noperspective vec3 edgeDistance;
-	vec3 tangent, bitangent;
 	mat3 TBN;
 } fragment;
 
@@ -53,9 +52,6 @@ void main(void)
 	bitangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
 	bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
 	bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-
-	fragment.tangent = normalize(tangent);
-	fragment.bitangent = normalize(bitangent);
 
 	for (int i=0;i<3;i++)
 	{

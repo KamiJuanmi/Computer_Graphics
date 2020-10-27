@@ -546,6 +546,11 @@ public:
 			if (i->positionIndices.size() > 0)
 			{
 				Group newGroup;
+
+				//Assignment3
+				glm::vec3 minVertex, maxVertex;
+				bool firstTime = true;
+
 				newGroup.name = i->name;
 				newGroup.startIndex = m_indices.size();
 
@@ -562,6 +567,19 @@ public:
 
 					Vertex vertex;
 					vertex.position = positions[index];
+
+					//OBTAINING THE MAX AND MIN
+					if (firstTime)
+					{
+						minVertex = maxVertex = vertex.position;
+						firstTime = false;
+
+					}
+					else
+					{
+						minVertex = min(minVertex, vertex.position);
+						maxVertex = max(maxVertex, vertex.position);
+					}
 					vertex.normal = normals[i->normalIndices[j]];
 					vertex.texcoord = texCoords[i->texCoordIndices[j]];
 
@@ -586,6 +604,11 @@ public:
 				}
 
 				newGroup.endIndex = m_indices.size();
+
+				//IMPLEMENTING THE CENTRE
+
+				newGroup.centre_group = (minVertex + maxVertex) * 0.5f;
+
 				m_groups.push_back(newGroup);
 			}
 		}
@@ -981,6 +1004,15 @@ void Model::load(const std::string& filename)
 			const auto & v = m_vertices[i];
 			m_minimumBounds = min(m_minimumBounds, v.position);
 			m_maximumBounds = max(m_maximumBounds, v.position);
+		}
+
+		//IMPLEMENTING THE OFFSET
+
+		m_centre = (m_minimumBounds + m_maximumBounds) * 0.5f;
+
+		for (auto &g : m_groups)
+		{
+			g.offsetVector = normalize(g.centre_group - m_centre);			
 		}
 
 		globjects::debug() << "Minimum bounds: " << m_minimumBounds;

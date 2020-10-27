@@ -11,6 +11,7 @@
 #include "Scene.h"
 #include "Interactor.h"
 #include "Renderer.h"
+#include "Animation.h"
 
 namespace minity
 {
@@ -48,6 +49,24 @@ namespace minity
 
 		void saveImage(const std::string & filename);
 
+		float &explosion();
+		float explosion() const;
+
+		bool& addFrame();
+		bool addFrame() const;
+
+		bool& remFrame();
+		bool remFrame() const;
+
+		bool& is_played();
+		bool is_played() const;
+
+		bool& clearFrames();
+		bool clearFrames() const;
+
+		Animation& animation();
+		Animation animation() const;
+
 	private:
 
 		void beginFrame();
@@ -76,6 +95,12 @@ namespace minity
 
 		bool m_showUi = true;
 		bool m_saveScreenshot = false;
+
+		float expl_degree = 0.0f;
+
+		bool add_frame = false, rem_frame = false, m_play = false, clear_frames = false;
+
+		Animation anim;
 	};
 
 
