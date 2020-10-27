@@ -54,8 +54,8 @@ void main(void)
 	bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
 	bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
 
-	fragment.tangent = (tangent);
-	fragment.bitangent = (bitangent);
+	fragment.tangent = normalize(tangent);
+	fragment.bitangent = normalize(bitangent);
 
 	for (int i=0;i<3;i++)
 	{

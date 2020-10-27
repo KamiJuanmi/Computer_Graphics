@@ -35,7 +35,8 @@ in fragmentData
 
 float bump_func(vec2 txCoord)
 {
-	return amp*pow(sin(freq*txCoord.x),2)*pow(sin(freq*txCoord.y),2);
+	//return amp*pow(sin(freq*txCoord.x),2)*pow(sin(freq*txCoord.y),2);
+	return amp*exp(pow(sin(freq*txCoord.x),2)*pow(cos(freq*txCoord.x),2))*(pow(sin(freq*txCoord.y),2)*pow(cos(freq*txCoord.y),2));
 }
 
 out vec4 fragColor;
@@ -52,12 +53,15 @@ void main()
 	{
 		normal = texture(tangentSpaceNormals, fragment.texCoord).xyz;
 		normal = normalize(normal * 2.0 - 1.0);
-		normal = normalize(fragment.TBN * normal);
 
 		if(bumpMapping)
 		{
-			normal = normal + dFdy(bump_func(fragment.texCoord))*(cross(fragment.TBN*fragment.bitangent,normalize(normal))) + dFdx(bump_func(fragment.texCoord))*(cross(normalize(normal),fragment.TBN*fragment.tangent));
+			//Pu = tangent; Pv=bitangent
+			//N' = N + dy(Pu x n) + dx(n x Pv)
+			normal = normal + dFdy(bump_func(fragment.texCoord))*(cross(fragment.tangent,normalize(normal))) + dFdx(bump_func(fragment.texCoord))*(cross(normalize(normal),fragment.bitangent));
 		}
+		
+		normal = normalize(fragment.TBN * normal);
 	}
 
 	
